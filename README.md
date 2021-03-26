@@ -7,6 +7,10 @@ An LOD argument can be used to get a simplified version of the diagram.
 - THIS IS A PROTOTYPE and does not yet include all the designated features!
 ```
 
+## Example
+
+todo
+
 ## ToDo for 1.0
 
 - introduce command line interface/arguments
@@ -19,6 +23,8 @@ An LOD argument can be used to get a simplified version of the diagram.
 - add link start/end icons
 - prettify resulting diagram in general
 - write build instructions
+- add example to readme
+- provide prebuild binaries
 
 ## Build instructions
 
@@ -31,4 +37,4 @@ As i want to finish 1.0 on my own as an exercise, i won't apply pull request unt
 ## License
 
 This application is made available under the GNU GENERAL PUBLIC LICENSE.
-Please see LICENSE file for further details.
+Please see the [LICENSE file](LICENSE.md) for further details.

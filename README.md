@@ -11,7 +11,7 @@ An LOD argument can be used to get a simplified version of the diagram.
 
 - bundle links in LOD reduction
 - add link start/end icons
-- separate links at exit of box
+- separate links vertically / at exit of box
 - allow horizontal alignment of children boxes
 - restructure and separate code into header and implementation files
 - introduce command line interface/arguments

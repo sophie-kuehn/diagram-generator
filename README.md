@@ -7,16 +7,9 @@ An LOD argument can be used to get a simplified version of the diagram.
 - THIS IS A PROTOTYPE and does not yet include all the designated features!
 ```
 
-## Example
-
-todo
-
 ## ToDo for 1.0
 
 - introduce command line interface/arguments
-- define config file schema and available arguments
-- write XML (or JSON?) file loader
-- replace hard coded example with file loader
 - write LOD transformer function
 - allow horizontal alignment of children boxes
 - optimize link drawing algorithms
@@ -24,8 +17,37 @@ todo
 - prettify resulting diagram in general
 - separate code into header and implementation files
 - write build instructions
-- add example to readme
 - provide prebuild binaries
+
+## Example
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<box text="A subject or some kind of nifty text.\nEven multi lined.">
+    <box text="1">
+        <box id="1.1" text="1.1" />
+        <box id="1.2" text="1.2" />
+    </box>
+    <box text="2">
+        <box text="2.1">
+            <link target="1.1" />
+            <link target="1.2" />
+
+            <box text="2.1.1">
+                <link target="1.1" />
+                <link target="2.2" />
+            </box>
+        </box>
+        <box id="2.2" text="2.2" />
+        <box text="" />
+        <box />
+    </box>
+</box>
+```
+
+generates:
+
+![Example](example/example.svg)
 
 ## Build instructions
 

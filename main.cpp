@@ -3,15 +3,25 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <map>
 #include <cairo.h>
 #include <cairo-svg.h>
+#include <libxml/parser.h>
+#include <libxml/tree.h>
 
 void print(const std::string &msg)
 {
     std::cout << msg.c_str() << std::endl;
 }
 
-std::vector<std::string> splitString(const std::string &s, char delim)
+void replaceInString(std::string& target, const std::string needle, const std::string replace)
+{
+    while(target.find(needle) != std::string::npos) {
+        target.replace(target.find(needle), needle.size(), replace);
+    }
+}
+
+std::vector<std::string> splitString(const std::string& s, char delim)
 {
     std::vector<std::string> elems;
     std::stringstream ss(s);
@@ -115,15 +125,21 @@ class BoxRenderer
 {
     public:
         BoxRenderer() = default;
+        double rootPadding = 20;
 
-        void render(Box* box, const std::string &fileName, double width, double height)
+        void render(Box* box, const std::string& fileName)
         {
-            auto surface = cairo_svg_surface_create(fileName.c_str(), width, height);
+            this->internalRender(box);
+
+            auto surface = cairo_svg_surface_create(fileName.c_str(),
+                box->renderedDimension.width + (this->rootPadding * 2),
+                box->renderedDimension.height + (this->rootPadding * 2)
+            );
+
             auto cairo = cairo_create(surface);
             cairo_set_source_rgb(cairo, 1, 1, 1);
             cairo_paint(cairo);
-            this->internalRender(box);
-            cairo_set_source_surface(cairo, box->surface, 20, 20);
+            cairo_set_source_surface(cairo, box->surface, this->rootPadding, this->rootPadding);
             cairo_paint(cairo);
             cairo_surface_flush(surface);
             cairo_surface_finish(surface);
@@ -147,7 +163,7 @@ class BoxRenderer
 
             // trigger internal render for children and transfer links
 
-            for (const auto &child : box->children) {
+            for (const auto& child : box->children) {
                 this->internalRender(child);
                 for (const auto &link : child->processedLinks) {
                     childrenLinks.push_back(link);
@@ -156,7 +172,7 @@ class BoxRenderer
 
             // find number of internal lanes and add assign lanes
 
-            for (const auto &link : childrenLinks) {
+            for (const auto& link : childrenLinks) {
                 if (link->skipLaneAssignment) continue;
                 BoxLink* targetLink = this->findMirrorLink(link, childrenLinks);
                 if (targetLink != nullptr) {
@@ -183,7 +199,7 @@ class BoxRenderer
 
             drawPosX = drawPosX + (interLaneCount * box->linkPadding);
 
-            for (const auto &child : box->children) {
+            for (const auto& child : box->children) {
                 // render child box
                 cairo_set_source_surface(cairo, child->surface, drawPosX, drawPosY);
                 cairo_paint(cairo);
@@ -201,7 +217,7 @@ class BoxRenderer
                 }
 
                 // translate last exit to origin box in links
-                for (const auto &link : child->processedLinks) {
+                for (const auto& link : child->processedLinks) {
                     link->lastExit.x = link->lastExit.x + link->lastStop->positionInParent.x;
                     link->lastExit.y = link->lastExit.y + link->lastStop->positionInParent.y;
                 }
@@ -209,7 +225,7 @@ class BoxRenderer
 
             // draw children links
 
-            for (const auto &link : childrenLinks) {
+            for (const auto& link : childrenLinks) {
                 link->skipLaneAssignment = false; // just to reset
                 if (link->reached) continue;
 
@@ -286,7 +302,7 @@ class BoxRenderer
 
         BoxLink* findMirrorLink(BoxLink* link, std::vector<BoxLink*> list)
         {
-            for (const auto &potentialTargetLink : list) {
+            for (const auto& potentialTargetLink : list) {
                 if (potentialTargetLink->target == link->origin
                     && potentialTargetLink->origin == link->target
                         ) return potentialTargetLink;
@@ -318,53 +334,103 @@ class BoxRenderer
         }
 };
 
+struct XmlReaderLink
+{
+    std::string origin;
+    std::string target;
+};
+
+class XmlReader
+{
+    private:
+        std::map<std::string, Box*> boxIdMap;
+        std::vector<XmlReaderLink> links;
+
+        int fallbackId = 0;
+        std::string getFallbackId()
+        {
+            std::string id = std::to_string(this->fallbackId);
+            while (this->boxIdMap.count(id) > 0) {
+                this->fallbackId++;
+                id = std::to_string(this->fallbackId);
+            }
+            return id;
+        }
+
+    public:
+        XmlReader() = default;
+
+        Box* read(const std::string& filePath)
+        {
+            this->boxIdMap.clear();
+
+            xmlDoc* doc = xmlReadFile(filePath.c_str(), nullptr, 0);
+            if (doc == nullptr) {
+                throw std::runtime_error("Could not parse config file from " + filePath);
+            }
+
+            auto box = this->processNodes(xmlDocGetRootElement(doc), "")[0];
+
+            for (const auto& link : this->links) {
+                if (this->boxIdMap.count(link.origin) > 0 && this->boxIdMap.count(link.target) > 0) {
+                    this->boxIdMap.at(link.origin)->addLink(this->boxIdMap.at(link.target));
+                }
+            }
+
+            xmlFreeDoc(doc);
+            xmlCleanupParser();
+
+            return box;
+        }
+
+        std::vector<Box*> processNodes(xmlNode* nodes, const std::string& parentId)
+        {
+            std::vector<Box*> boxes;
+            xmlNode* node = nullptr;
+
+            for (node = nodes; node; node = node->next) {
+                if (node->type != XML_ELEMENT_NODE) continue;
+                std::string name = (const char*)node->name;
+
+                if (name == "link" && !parentId.empty()) {
+                    xmlChar* target = xmlGetProp(node, (const xmlChar*)"target");
+                    if (target != nullptr) {
+                        this->links.push_back({parentId, (const char*)target});
+                    }
+
+                } else if (name == "box") {
+                    auto box = new Box();
+
+                    xmlChar* text = xmlGetProp(node, (const xmlChar*)"text");
+                    if (text != nullptr) {
+                        box->text = (const char*)text;
+                        replaceInString(box->text, "\\n", "\n");
+                    }
+
+                    std::string sId;
+                    xmlChar* id = xmlGetProp(node, (const xmlChar*)"id");
+                    if (id != nullptr) {
+                        sId = (const char*)id;
+                    } else {
+                        sId = this->getFallbackId();
+                    }
+
+                    this->boxIdMap[sId] = box;
+                    box->children = this->processNodes(node->children, sId);
+                    boxes.push_back(box);
+                }
+            }
+
+
+            return boxes;
+        }
+};
+
 int main()
 {
-    auto a = new Box();
-    a->text = "Subject";
-
-    auto b = new Box();
-    b->text = "b";
-    a->addChild(b);
-
-    auto c = new Box();
-    c->text = "c";
-    a->addChild(c);
-
-    auto d = new Box();
-    //d->horizontalArrangement = true;
-    a->addChild(d);
-
-    auto e = new Box();
-    e->text = "fggddfgs";
-    d->addChild(e);
-
-    auto f = new Box();
-    f->text = "new";
-    d->addChild(f);
-
-    auto g = new Box();
-    g->text = "g";
-    f->addChild(g);
-
-    auto h = new Box();
-    h->text = "h";
-    h->addLink(g);
-    f->addChild(h);
-
-    auto i = new Box();
-    i->text = "i";
-    i->addLink(g);
-    c->addChild(i);
-
-    auto j = new Box();
-    j->text = "j";
-    j->addLink(h);
-    j->addLink(b);
-    f->addChild(j);
-
+    auto reader = new XmlReader();
     auto renderer = new BoxRenderer();
-    renderer->render(a, "image.svg", 600, 400);
+    renderer->render(reader->read("../example/example.xml"), "../example/example.svg");
 
     return 0;
 }

@@ -6,3 +6,29 @@ An LOD argument can be used to get a simplified version of the diagram.
 ```diff
 - THIS IS A PROTOTYPE and does not yet include all the designated features!
 ```
+
+## ToDo for 1.0
+
+- introduce command line interface/arguments
+- define config file schema and available arguments
+- write XML (or JSON?) file loader
+- replace hard coded example with file loader
+- write LOD transformer function
+- allow horizontal alignment of children boxes
+- optimize link drawing algorithms
+- add link start/end icons
+- prettify resulting diagram in general
+- write build instructions
+
+## Build instructions
+
+todo
+
+## Contribution
+
+As i want to finish 1.0 on my own as an exercise, i won't apply pull request until that goal is reached, sorry.
+
+## License
+
+This application is made available under the GNU GENERAL PUBLIC LICENSE.
+Please see LICENSE file for further details.

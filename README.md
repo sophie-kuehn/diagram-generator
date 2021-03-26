@@ -32,6 +32,7 @@ An LOD argument can be used to get a simplified version of the diagram.
         <box text="2.1">
             <link target="1.1" />
             <link target="1.2" />
+            <link target="3.1" />
 
             <box text="2.1.1">
                 <link target="1.1" />
@@ -42,7 +43,11 @@ An LOD argument can be used to get a simplified version of the diagram.
         <box text="" />
         <box />
     </box>
+    <box text="3">
+        <box id="3.1" text="3.1" />
+    </box>
 </box>
+
 ```
 
 generates:

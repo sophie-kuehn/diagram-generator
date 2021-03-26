@@ -22,6 +22,7 @@ todo
 - optimize link drawing algorithms
 - add link start/end icons
 - prettify resulting diagram in general
+- separate code into header and implementation files
 - write build instructions
 - add example to readme
 - provide prebuild binaries

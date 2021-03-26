@@ -8,6 +8,7 @@
         <box text="2.1">
             <link target="1.1" />
             <link target="1.2" />
+            <link target="3.1" />
 
             <box text="2.1.1">
                 <link target="1.1" />
@@ -17,5 +18,8 @@
         <box id="2.2" text="2.2" />
         <box text="" />
         <box />
+    </box>
+    <box text="3">
+        <box id="3.1" text="3.1" />
     </box>
 </box>

@@ -9,13 +9,13 @@ An LOD argument can be used to get a simplified version of the diagram.
 
 ## ToDo for 1.0
 
-- introduce command line interface/arguments
-- write LOD transformer function
-- allow horizontal alignment of children boxes
-- optimize link drawing algorithms
+- bundle links in LOD reduction
 - add link start/end icons
-- prettify resulting diagram in general
+- separate links at exit of box
+- allow horizontal alignment of children boxes
 - restructure and separate code into header and implementation files
+- introduce command line interface/arguments
+- prettify resulting diagram in general
 - write build instructions
 - provide prebuild binaries
 
@@ -48,6 +48,10 @@ An LOD argument can be used to get a simplified version of the diagram.
 generates:
 
 ![Example](example/example.svg)
+
+and with an LOD of 2:
+
+![Example](example/example_lod2.svg)
 
 ## Build instructions
 

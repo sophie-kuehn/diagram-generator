@@ -107,9 +107,11 @@ class Box
         std::vector<BoxLink*> processedLinks;
         Position positionInParent = {0,0};
         Dimension renderedDimension = {0,0};
+        bool rendered = false;
 
         void reset()
         {
+            this->rendered = false;
             this->renderedDimension = {0,0};
             this->positionInParent = {0,0};
             this->processedLinks.clear();
@@ -127,9 +129,9 @@ class BoxRenderer
         BoxRenderer() = default;
         double rootPadding = 20;
 
-        void render(Box* box, const std::string& fileName)
+        void render(Box* box, const std::string& fileName, int lod)
         {
-            this->internalRender(box);
+            this->internalRender(box, lod);
 
             auto surface = cairo_svg_surface_create(fileName.c_str(),
                 box->renderedDimension.width + (this->rootPadding * 2),
@@ -145,7 +147,7 @@ class BoxRenderer
             cairo_surface_finish(surface);
         }
 
-        void internalRender(Box* box)
+        void internalRender(Box* box, int lod)
         {
             // init
 
@@ -161,13 +163,28 @@ class BoxRenderer
             double maxChildrenHeight = 0;
             int interLaneCount = 0;
 
+            lod--;
+
             // trigger internal render for children and transfer links
 
             for (const auto& child : box->children) {
-                this->internalRender(child);
+                this->internalRender(child, lod);
                 for (const auto &link : child->processedLinks) {
                     childrenLinks.push_back(link);
                 }
+            }
+
+            // just pass external links though if lod is below zero
+
+            if (lod < 0) {
+                for (const auto &link : childrenLinks) {
+                    BoxLink* targetLink = this->findMirrorLink(link, childrenLinks);
+                    if (targetLink != nullptr) continue;
+                    link->lastStop = box;
+                    link->lastExit = {0, 0};
+                    box->processedLinks.push_back(link);
+                }
+                return;
             }
 
             // find number of internal lanes and add assign lanes
@@ -200,6 +217,10 @@ class BoxRenderer
             drawPosX = drawPosX + (interLaneCount * box->linkPadding);
 
             for (const auto& child : box->children) {
+                if (!child->rendered) {
+                    continue;
+                }
+
                 // render child box
                 cairo_set_source_surface(cairo, child->surface, drawPosX, drawPosY);
                 cairo_paint(cairo);
@@ -298,6 +319,7 @@ class BoxRenderer
             cairo_set_line_width(cairo, 2);
             cairo_rectangle(cairo, 0, 0, box->renderedDimension.width, box->renderedDimension.height);
             cairo_stroke(cairo);
+            box->rendered = true;
         }
 
         BoxLink* findMirrorLink(BoxLink* link, std::vector<BoxLink*> list)
@@ -430,7 +452,8 @@ int main()
 {
     auto reader = new XmlReader();
     auto renderer = new BoxRenderer();
-    renderer->render(reader->read("../example/example.xml"), "../example/example.svg");
+    renderer->render(reader->read("../example/example.xml"), "../example/example.svg", 9999);
+    renderer->render(reader->read("../example/example.xml"), "../example/example_lod2.svg", 2);
 
     return 0;
 }

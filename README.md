@@ -15,7 +15,7 @@ An LOD argument can be used to get a simplified version of the diagram.
 - optimize link drawing algorithms
 - add link start/end icons
 - prettify resulting diagram in general
-- separate code into header and implementation files
+- restructure and separate code into header and implementation files
 - write build instructions
 - provide prebuild binaries
 

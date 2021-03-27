@@ -1,6 +1,6 @@
-## SDG - Sophies Structure Diagram Generator
+## SDG - Sophie's Structure Diagram Generator
 
-This is a command line application/script, that generates a structural diagram as CSV from configuration like XML.
+This is a command line application/script, that generates a structural diagram as SVG from configuration like XML.
 An LOD argument can be used to get a simplified version of the diagram.
 
 ```diff

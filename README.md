@@ -36,11 +36,12 @@ An LOD argument can be used to get a simplified version of the diagram.
             <box text="2.1.1">
                 <link target="1.1" />
                 <link target="2.2" />
+                <link target="2.4" />
             </box>
         </box>
         <box id="2.2" text="2.2" />
         <box text="" />
-        <box />
+        <box id="2.4" />
     </box>
     <box text="3">
         <box id="3.1" text="3.1" />

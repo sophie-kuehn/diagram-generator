@@ -73,7 +73,9 @@ and with an LOD of 2:
 
 As i want to finish 1.0 on my own as an exercise, i won't apply pull request until that goal is reached, sorry.
 
-## License
+## Copyright & License
+
+Copyright (c) Sophie Kühn
 
 This application is made available under the GNU General Public License v3.0.
 Please see the [LICENSE](LICENSE) file for further details.

@@ -13,11 +13,11 @@ An LOD argument can be used to get a simplified version of the diagram.
 - add link start/end icons
 - separate links vertically / at exit of box
 - allow horizontal alignment of children boxes
-- restructure and separate code into header and implementation files
 - introduce command line interface/arguments
 - prettify resulting diagram in general
 - write build instructions
 - provide prebuild binaries
+- cleanup prototype code
 
 ## Example
 

@@ -4,7 +4,11 @@ project(SophiesDiagramGenerator)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-add_executable(SophiesDiagramGenerator main.cpp)
+add_executable(SophiesDiagramGenerator
+    source/sdg.cpp
+    source/xmlLoader.cpp
+    source/main.cpp
+)
 
 find_package(LibXml2 REQUIRED)
 include_directories(${LIBXML2_INCLUDE_DIR})

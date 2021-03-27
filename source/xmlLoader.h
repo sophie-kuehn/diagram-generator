@@ -25,6 +25,7 @@ namespace SDG
         int fallbackId = 0;
 
         std::string getFallbackId();
+        std::string getPropValue(xmlNode* node, std::string name);
 
       public:
         XmlLoader() = default;

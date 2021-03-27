@@ -59,14 +59,14 @@ namespace SDG
         this->internalRender(box, lod);
 
         auto surface = cairo_svg_surface_create(fileName.c_str(),
-            box->renderedDimension.width + (this->rootPadding * 2),
-            box->renderedDimension.height + (this->rootPadding * 2)
+            box->renderedDimension.width + (box->rootMargin * 2),
+            box->renderedDimension.height + (box->rootMargin * 2)
         );
 
         auto cairo = cairo_create(surface);
         cairo_set_source_rgb(cairo, 1, 1, 1);
         cairo_paint(cairo);
-        cairo_set_source_surface(cairo, box->surface, this->rootPadding, this->rootPadding);
+        cairo_set_source_surface(cairo, box->surface, box->rootMargin, box->rootMargin);
         cairo_paint(cairo);
         cairo_surface_flush(surface);
         cairo_surface_finish(surface);
@@ -127,12 +127,11 @@ namespace SDG
         if (!box->text.empty()) {
             cairo_set_source_rgb(cairo, 0, 0, 0);
             cairo_move_to(cairo, drawPos.x, drawPos.y);
-            cairo_select_font_face(cairo, "Tahoma", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
-            cairo_set_font_size(cairo, 14);
+            cairo_select_font_face(cairo, box->font.family, box->font.slant, box->font.weight);
+            cairo_set_font_size(cairo, box->font.size);
             Dimension textDimensions = this->drawMultiLineText(cairo, box->text);
-            maxChildrenSize.width = textDimensions.width;
-            maxChildrenSize.height = textDimensions.height;
-            drawPos.y = drawPos.y + textDimensions.height + box->padding;
+            maxChildrenSize = textDimensions;
+            drawPos.y = drawPos.y + textDimensions.height + box->childrenPadding;
         }
 
         // draw children
@@ -158,11 +157,11 @@ namespace SDG
                 maxChildrenSize.height = child->renderedDimension.height;
 
             // move draw pos for next child
-            if (box->horizontalArrangement) {
-                drawPos.x = drawPos.x + child->renderedDimension.width + box->padding;
-            } else {
-                drawPos.y = drawPos.y + child->renderedDimension.height + box->padding;
-            }
+            //if (box->horizontalArrangement) {
+            //    drawPos.x = drawPos.x + child->renderedDimension.width + box->childrenPadding;
+            //} else {
+                drawPos.y = drawPos.y + child->renderedDimension.height + box->childrenPadding;
+            //}
 
             // translate last exit to origin box in links
             for (const auto& link : child->processedLinks) {
@@ -170,6 +169,8 @@ namespace SDG
                 link->lastExit.y = link->lastExit.y + link->lastStop->positionInParent.y;
             }
         }
+
+        drawPos.y = drawPos.y - box->childrenPadding + box->padding;
 
         // draw children links
 
@@ -232,18 +233,18 @@ namespace SDG
 
         // calc inner width and height of box
 
-        if (box->horizontalArrangement) {
+        /*if (box->horizontalArrangement) {
             box->renderedDimension.width = drawPos.x;
 
             box->renderedDimension.height = maxChildrenSize.height
                 + (box->padding * 2);
-        } else {
+        } else {*/
             box->renderedDimension.width = maxChildrenSize.width
                 + (box->padding * 2)
                 + (interLaneCount * box->linkPadding);
 
             box->renderedDimension.height = drawPos.y;
-        }
+        //}
 
         // draw border
 

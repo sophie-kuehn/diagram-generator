@@ -23,12 +23,12 @@ An LOD argument can be used to get a simplified version of the diagram.
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<box text="A subject or some kind of nifty text.\nEven multi lined.">
-    <box text="1">
+<box text="A subject or some kind of nifty text.\nEven multi lined." rootMargin="10">
+    <box text="1" childrenPadding="10">
         <box id="1.1" text="1.1" />
         <box id="1.2" text="1.2" />
     </box>
-    <box text="2">
+    <box text="2" padding="10" linkPadding="10">
         <box text="2.1">
             <link target="1.1" />
             <link target="1.2" />

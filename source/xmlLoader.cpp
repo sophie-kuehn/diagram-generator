@@ -1,3 +1,4 @@
+#include <iostream>
 #include "xmlLoader.h"
 
 namespace SDG
@@ -53,27 +54,29 @@ namespace SDG
             std::string name = (const char*)node->name;
 
             if (name == "link" && !parentId.empty()) {
-                xmlChar* target = xmlGetProp(node, (const xmlChar*)"target");
-                if (target != nullptr) {
-                    this->links.push_back({parentId, (const char*)target});
-                }
+                std::string linkTarget = this->getPropValue(node, "target");
+                if (!linkTarget.empty()) this->links.push_back({parentId, linkTarget});
 
             } else if (name == "box") {
                 auto box = new Box();
 
-                xmlChar* text = xmlGetProp(node, (const xmlChar*)"text");
-                if (text != nullptr) {
-                    box->text = (const char*)text;
-                    replaceInString(box->text, "\\n", "\n");
-                }
+                box->text = this->getPropValue(node, "text");
+                if (!box->text.empty()) replaceInString(box->text, "\\n", "\n");
 
-                std::string sId;
-                xmlChar* id = xmlGetProp(node, (const xmlChar*)"id");
-                if (id != nullptr) {
-                    sId = (const char*)id;
-                } else {
-                    sId = this->getFallbackId();
-                }
+                std::string sId = this->getPropValue(node, "id");
+                if (sId.empty()) sId = this->getFallbackId();
+
+                std::string rootMargin = this->getPropValue(node, "rootMargin");
+                if (!rootMargin.empty()) box->rootMargin = std::stoi(rootMargin);
+
+                std::string padding = this->getPropValue(node, "padding");
+                if (!padding.empty()) box->padding = std::stoi(padding);
+
+                std::string childrenPadding = this->getPropValue(node, "childrenPadding");
+                if (!childrenPadding.empty()) box->childrenPadding = std::stoi(childrenPadding);
+
+                std::string linkPadding = this->getPropValue(node, "linkPadding");
+                if (!linkPadding.empty()) box->linkPadding = std::stoi(linkPadding);
 
                 this->boxIdMap[sId] = box;
                 box->children = this->processNodes(node->children, sId);
@@ -82,6 +85,15 @@ namespace SDG
         }
 
         return boxes;
+    }
+
+    std::string XmlLoader::getPropValue(xmlNode* node, std::string name)
+    {
+        xmlChar* value = xmlGetProp(node, (const xmlChar*)name.c_str());
+        if (value != nullptr) {
+            return (const char*)value;
+        }
+        return "";
     }
 
 }

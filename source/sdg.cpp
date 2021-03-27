@@ -15,6 +15,7 @@ namespace SDG
         std::ofstream fileOut;
         fileOut.open(filename, mode);
         fileOut << msg << std::endl;
+        fileOut.close();
     }
 
     std::vector<std::string> splitString(const std::string& s, char delim)
@@ -119,7 +120,7 @@ namespace SDG
         // find number of internal lanes and add assign lanes
 
         for (const auto& link : childrenLinks) {
-            if (link->skipLaneAssignment) continue;
+            if (link->skipLaneAssignment || !link->lastStop->rendered) continue;
             BoxLink* targetLink = this->findMirrorLink(link, childrenLinks);
             if (targetLink != nullptr) {
                 targetLink->skipLaneAssignment = true;

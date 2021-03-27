@@ -19,15 +19,14 @@ find_package(Cairo REQUIRED)
 include_directories(${CAIRO_INCLUDE_DIR})
 target_link_libraries(SophiesDiagramGenerator ${CAIRO_LIBRARIES})
 
-add_custom_command(
+function(buildExample)
+    add_custom_command(
         TARGET ${PROJECT_NAME}
         POST_BUILD
-        COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/example/example.xml ${CMAKE_CURRENT_SOURCE_DIR}/example/example_lod2.svg 2
-)
+        COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/example/example.xml ${CMAKE_CURRENT_SOURCE_DIR}/example/${ARGV0}.svg ${ARGV1}
+    )
+endfunction()
 
-add_custom_command(
-    TARGET ${PROJECT_NAME}
-    POST_BUILD
-    COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/example/example.xml ${CMAKE_CURRENT_SOURCE_DIR}/example/example.svg 9999
-    USES_TERMINAL
-)
+buildExample(example 9999)
+buildExample(example_lod2 2)
+

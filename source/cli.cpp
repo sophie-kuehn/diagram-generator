@@ -24,6 +24,7 @@ int main(int argc, char* argv[])
         return 1;
     }
 
+    SDG::log("init", true);
     auto loader = new SDG::XmlLoader();
     auto renderer = new SDG::BoxRenderer();
     renderer->render(loader->load(inputFile), outputFile, lod);

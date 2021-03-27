@@ -10,6 +10,8 @@
 namespace SDG
 {
 
+    void log(const std::string &msg, bool clear = false);
+
     struct Position
     {
         double x = 0;

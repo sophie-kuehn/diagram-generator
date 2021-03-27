@@ -1,14 +1,20 @@
 #include <iostream>
 #include <sstream>
+#include <fstream>
 
 #include "sdg.h"
 
 namespace SDG
 {
 
-    void print(const std::string &msg)
+    void log(const std::string &msg, bool clear)
     {
-        std::cout << msg.c_str() << std::endl;
+        std::ios_base::openmode mode = std::ios_base::app;
+        if (clear) mode = std::ios_base::out;
+        std::string filename("sdg.log");
+        std::ofstream fileOut;
+        fileOut.open(filename, mode);
+        fileOut << msg << std::endl;
     }
 
     std::vector<std::string> splitString(const std::string& s, char delim)
@@ -215,7 +221,7 @@ namespace SDG
                 link->reached = true;
                 targetLink->reached = true;
 
-                print("CONNECTED | " + box->text + " | " + link->origin->text + " | " + link->target->text);
+                log("CONNECTED | " + box->text + " | " + link->origin->text + " | " + link->target->text);
 
             } else {
                 // external link
@@ -225,7 +231,7 @@ namespace SDG
                 link->lastExit = {0, link->lastExit.y};
                 box->processedLinks.push_back(link);
 
-                print("PASSED THROUGH | " + box->text + " | " + link->origin->text + " | " + link->target->text);
+                log("PASSED THROUGH | " + box->text + " | " + link->origin->text + " | " + link->target->text);
             }
 
             cairo_stroke(cairo);

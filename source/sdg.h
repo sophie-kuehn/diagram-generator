@@ -24,7 +24,7 @@ namespace SDG
 
     struct Font
     {
-        const char *family = "Tahoma";
+        const char* family = "Tahoma";
         double size = 14;
         cairo_font_slant_t slant = CAIRO_FONT_SLANT_NORMAL;
         cairo_font_weight_t weight = CAIRO_FONT_WEIGHT_NORMAL;

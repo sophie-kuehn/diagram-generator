@@ -77,5 +77,5 @@ As i want to finish 1.0 on my own as an exercise, i won't apply pull request unt
 
 Copyright (c) Sophie Kühn
 
-This application is made available under the GNU General Public License v3.0.
+This application is made available under the GNU General Public License v3.0.  
 Please see the [LICENSE](LICENSE) file for further details.

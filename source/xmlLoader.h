@@ -10,11 +10,12 @@
 
 namespace SDG
 {
-
     struct XmlLoaderLink
     {
         std::string origin;
         std::string target;
+        std::string startCap;
+        std::string endCap;
     };
 
     class XmlLoader
@@ -33,7 +34,6 @@ namespace SDG
         Box* load(const std::string& filePath);
         std::vector<Box*> processNodes(xmlNode* nodes, const std::string& parentId);
     };
-
 }
 
 #endif

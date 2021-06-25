@@ -9,6 +9,17 @@
 
 namespace SDG
 {
+    const auto DEFAULT_FONT_FAMILY = "Tahoma";
+    const double DEFAULT_FONT_SIZE = 14;
+
+    const auto DEFAULT_START_CAP = "";
+    const auto DEFAULT_END_CAP = "arrowIn";
+    const double DEFAULT_CAP_SIZE = 3;
+
+    const double DEFAULT_ROOT_BOX_MARGIN = 10;
+    const double DEFAULT_BOX_PADDING = 5;
+    const double DEFAULT_BOX_CHILDREN_PADDING = 5;
+    const double DEFAULT_BOX_LINK_PADDING = 5;
 
     void log(const std::string &msg, bool clear = false);
 
@@ -26,8 +37,8 @@ namespace SDG
 
     struct Font
     {
-        const char* family = "Tahoma";
-        double size = 14;
+        const char* family = DEFAULT_FONT_FAMILY;
+        double size = DEFAULT_FONT_SIZE;
         cairo_font_slant_t slant = CAIRO_FONT_SLANT_NORMAL;
         cairo_font_weight_t weight = CAIRO_FONT_WEIGHT_NORMAL;
     };
@@ -41,6 +52,8 @@ namespace SDG
         Box* target = nullptr;
         Box* lastStop = nullptr;
         Position lastExit;
+        std::string startCap;
+        std::string endCap;
         int interLane = 0;
         bool reached = false;
         bool skipLaneAssignment = false;
@@ -58,10 +71,10 @@ namespace SDG
         std::vector<BoxLink*> links;
         std::vector<BoxLink*> processedLinks;
         Font font;
-        double padding = 5;
-        double childrenPadding = 5;
-        double linkPadding = 5;
-        double rootMargin = 10;
+        double padding = DEFAULT_BOX_PADDING;
+        double childrenPadding = DEFAULT_BOX_CHILDREN_PADDING;
+        double linkPadding = DEFAULT_BOX_LINK_PADDING;
+        double rootMargin = DEFAULT_ROOT_BOX_MARGIN;
         bool horizontalArrangement = false;
         bool rendered = false;
         Position positionInParent;
@@ -70,7 +83,7 @@ namespace SDG
 
         Box() = default;
 
-        void addLink(Box* target);
+        void addLink(Box* target, std::string startCap, std::string endCap);
         void reset();
     };
 
@@ -85,8 +98,8 @@ namespace SDG
         void internalRender(Box* box, int lod);
         BoxLink* findMirrorLink(BoxLink* link, std::vector<BoxLink*> list);
         Dimension drawMultiLineText(cairo_t* cairo, std::string &text);
+        void drawLineCap(cairo_t* cairo, BoxLink* link, Position position, bool isEnd);
     };
-
 }
 
 #endif

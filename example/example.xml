@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <box text="A subject or some kind of nifty text.\nEven multi lined." rootMargin="10">
-    <box text="1" childrenPadding="10">
+    <box text="1" childrenPadding="10" padding="10">
         <box id="1.1" text="1.1" />
         <box id="1.2" text="1.2" />
     </box>
@@ -11,7 +11,7 @@
             <link target="3.1" />
 
             <box text="2.1.1">
-                <link target="1.1" />
+                <link target="1.1" startCap="arrowOut" endCap="arrowIn:5" />
                 <link target="2.2" />
                 <link target="2.4" />
             </box>

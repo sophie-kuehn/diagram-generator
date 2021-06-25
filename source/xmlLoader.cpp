@@ -34,7 +34,11 @@ namespace SDG
 
         for (const auto& link : this->links) {
             if (this->boxIdMap.count(link.origin) > 0 && this->boxIdMap.count(link.target) > 0) {
-                this->boxIdMap.at(link.origin)->addLink(this->boxIdMap.at(link.target));
+                this->boxIdMap.at(link.origin)->addLink(
+                    this->boxIdMap.at(link.target),
+                    link.startCap,
+                    link.endCap
+                );
             }
         }
 
@@ -54,8 +58,10 @@ namespace SDG
             std::string name = (const char*)node->name;
 
             if (name == "link" && !parentId.empty()) {
+                std::string startCap = this->getPropValue(node, "startCap");
+                std::string endCap = this->getPropValue(node, "endCap");
                 std::string linkTarget = this->getPropValue(node, "target");
-                if (!linkTarget.empty()) this->links.push_back({parentId, linkTarget});
+                if (!linkTarget.empty()) this->links.push_back({parentId, linkTarget, startCap, endCap});
 
             } else if (name == "box") {
                 auto box = new Box();

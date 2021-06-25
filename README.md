@@ -10,7 +10,6 @@ An LOD argument can be used to get a simplified version of the diagram.
 ## ToDo for 1.0
 
 - bundle links in LOD reduction
-- add link start/end icons
 - separate links vertically / at exit of box
 - allow horizontal alignment of children boxes
 - prettify resulting diagram in general
@@ -23,7 +22,7 @@ An LOD argument can be used to get a simplified version of the diagram.
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <box text="A subject or some kind of nifty text.\nEven multi lined." rootMargin="10">
-    <box text="1" childrenPadding="10">
+    <box text="1" childrenPadding="10" padding="10">
         <box id="1.1" text="1.1" />
         <box id="1.2" text="1.2" />
     </box>
@@ -34,7 +33,7 @@ An LOD argument can be used to get a simplified version of the diagram.
             <link target="3.1" />
 
             <box text="2.1.1">
-                <link target="1.1" />
+                <link target="1.1" startCap="arrowOut" endCap="arrowIn:5" />
                 <link target="2.2" />
                 <link target="2.4" />
             </box>
@@ -47,7 +46,6 @@ An LOD argument can be used to get a simplified version of the diagram.
         <box id="3.1" text="3.1" />
     </box>
 </box>
-
 ```
 
 generates:

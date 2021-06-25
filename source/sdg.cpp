@@ -35,16 +35,23 @@ namespace SDG
         this->lastStop = this->origin;
     }
 
-    void Box::addLink(SDG::Box* target)
+    void Box::addLink(Box* target, std::string startCap, std::string endCap)
     {
+        if (endCap.empty()) endCap = (std::string)DEFAULT_END_CAP + ":" + std::to_string(DEFAULT_CAP_SIZE);
+        if (startCap.empty()) startCap = (std::string)DEFAULT_START_CAP + ":" + std::to_string(DEFAULT_CAP_SIZE);
+
         auto link = new BoxLink();
         link->target = target;
         link->origin = this;
+        link->startCap = startCap;
+        link->endCap = endCap;
         this->links.push_back(link);
 
         auto mirror = new BoxLink();
         mirror->target = this;
         mirror->origin = target;
+        mirror->startCap = endCap;
+        mirror->endCap = startCap;
         target->links.push_back(mirror);
     }
 
@@ -209,6 +216,10 @@ namespace SDG
             cairo_set_line_width(cairo, 1);
             cairo_move_to(cairo, link->lastExit.x, link->lastExit.y);
 
+            if (link->origin == link->lastStop) {
+                this->drawLineCap(cairo, link, link->lastExit, false);
+            }
+
             // find target link if it exists
             BoxLink* targetLink = this->findMirrorLink(link, childrenLinks);
 
@@ -218,6 +229,10 @@ namespace SDG
                 cairo_line_to(cairo, link->lastExit.x - (box->linkPadding * link->interLane), link->lastExit.y);
                 cairo_line_to(cairo, targetLink->lastExit.x - (box->linkPadding * link->interLane), targetLink->lastExit.y);
                 cairo_line_to(cairo, targetLink->lastExit.x, targetLink->lastExit.y);
+
+                if (link->target == targetLink->lastStop) {
+                    this->drawLineCap(cairo, link, targetLink->lastExit, true);
+                }
 
                 link->reached = true;
                 targetLink->reached = true;
@@ -260,6 +275,41 @@ namespace SDG
         cairo_rectangle(cairo, 0, 0, box->renderedDimension.width, box->renderedDimension.height);
         cairo_stroke(cairo);
         box->rendered = true;
+    }
+
+    void BoxRenderer::drawLineCap(cairo_t* cairo, BoxLink* link, Position position, bool isEnd)
+    {
+        std::string type = DEFAULT_START_CAP;
+        if (isEnd) type = DEFAULT_END_CAP;
+        double size = DEFAULT_CAP_SIZE;
+
+        std::string cap = link->startCap;
+        if (isEnd) cap = link->endCap;
+        std::vector<std::string> options = splitString(cap, ':');
+        if (!options.empty()) type = options[0];
+        if (options.size() >= 2) size = std::stoi(options[1]);
+
+        if (type == "arrowIn") {
+            cairo_stroke(cairo);
+            cairo_move_to(cairo, position.x, position.y);
+            cairo_line_to(cairo, position.x-size, position.y-size);
+            cairo_line_to(cairo, position.x-size, position.y+size);
+            cairo_line_to(cairo, position.x, position.y);
+            cairo_fill_preserve(cairo);
+
+            log("CAP | " + type + " | " + (isEnd ? "end" : "start"));
+
+        } else if (type == "arrowOut") {
+            cairo_stroke(cairo);
+            cairo_move_to(cairo, position.x-size-2, position.y);
+            cairo_line_to(cairo, position.x-2, position.y-size);
+            cairo_line_to(cairo, position.x-2, position.y+size);
+            cairo_line_to(cairo, position.x-size-2, position.y);
+            cairo_move_to(cairo, position.x, position.y);
+            cairo_fill_preserve(cairo);
+
+            log("CAP | " + type + " | " + (isEnd ? "end" : "start"));
+        }
     }
 
     Dimension BoxRenderer::drawMultiLineText(cairo_t* cairo, std::string& text)

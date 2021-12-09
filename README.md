@@ -7,6 +7,10 @@ An LOD argument can be used to get a simplified version of the diagram.
 - THIS IS A PROTOTYPE and does not yet include all the designated features!
 ```
 
+## Archived
+
+I stoppped working on this. Maybe i continue later, maybe not. If you are looking for something like this, but is polished and already of real use, please consider https://plantuml.com :-)
+
 ## ToDo for 1.0
 
 - bundle links in LOD reduction
